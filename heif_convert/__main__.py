@@ -112,26 +112,38 @@ def main():
     for input_file in args.input:
         logging.info(f"Reading {os.path.abspath(input_file)}")
         image = Image.open(input_file)
-        output_filename = (
-            args.output.format(
-                name=os.path.splitext(os.path.basename(input_file))[0],
-            )
-            + "."
-            + args.format
-        )
-        output_filepath = os.path.join(
-            args.path.format(
-                path=os.path.dirname(os.path.abspath(input_file)),
-            ),
-            output_filename,
-        )
-        logging.info(f"Writing {output_filepath}")
-        if args.exif:
-            image.save(output_filepath, quality=args.quality, exif=image.getexif())
-        else:
-            image.save(output_filepath, quality=args.quality)
-        print(f"Wrote {output_filepath}")
+        num_frames = image.n_frames
 
+        if num_frames > 1:
+            print(f"File contains {num_frames} images")
+
+        for frame_index in range(num_frames):
+            output_filename = (
+                args.output.format(
+                    name=os.path.splitext(os.path.basename(input_file))[0],
+                )
+                + (f"-{frame_index + 1}" if num_frames > 1 else "")
+                + "."
+                + args.format
+            )
+
+            output_filepath = os.path.join(
+                args.path.format(
+                    path=os.path.dirname(os.path.abspath(input_file)),
+                ),
+                output_filename,
+            )
+
+            logging.info(f"Writing {output_filepath}")
+
+            image.seek(frame_index)
+
+            if args.exif:
+                image.save(output_filepath, quality=args.quality, exif=image.getexif())
+            else:
+                image.save(output_filepath, quality=args.quality)
+
+            print(f"Wrote {output_filepath}")
 
 if __name__ == "__main__":
     main()
