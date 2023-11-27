@@ -14,6 +14,10 @@ compare_hashes() {
   fi
 }
 
+rm -f image.jpg image.png \
+  multi-frame-image-1.jpg multi-frame-image-2.jpg multi-frame-image-3.jpg \
+  multi-frame-image-1.png multi-frame-image-2.png multi-frame-image-3.png
+
 heif-convert image.heic -f jpg -q 90
 heif-convert image.heic -f png
 
